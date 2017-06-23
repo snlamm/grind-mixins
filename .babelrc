@@ -1,0 +1,13 @@
+{
+	"presets": [ "grind" ],
+	"plugins": [
+		[
+			"module-resolver", {
+				"alias": {
+					"Helpers": "./test/helpers",
+					"Src": "./src"
+				}
+			}
+		]
+	]
+}
