@@ -51,10 +51,10 @@ export class Mixin {
 			throw new MixinError(`Failed to register: missing mergeSchema method: ${methodName}`)
 		}
 
-		return this._structure(targetClass, mergeSchema)
+		return this.structure(targetClass, mergeSchema)
 	}
 
-	static _structure(target, mergeSchema) {
+	static structure(target, mergeSchema) {
 		for(const [ mergeMethod, mixins ] of Object.entries(mergeSchema)) {
 			const type = mergeMethod.split(/\d+$/)[0]
 
@@ -90,6 +90,14 @@ export class Mixin {
 
 		if(typeof mixin === 'string') {
 			return this._structureMixinString(mixin, usesPrototype, overrideDepends)
+		}
+
+		const isUnNested = (
+			Object.keys(mixin[mixinName])[0] === 'action') && (typeof mixin[mixinName].action === 'function'
+		)
+
+		if(isUnNested) {
+			mixin = { [mixinName]: mixin }
 		}
 
 		const use = mixin.use
@@ -292,7 +300,7 @@ export class Mixin {
 			mergeSchema = [ mergeSchema ]
 		}
 
-		this.constructor._structure(this.parentClass, { [mergeType]: mergeSchema })
+		this.constructor.structure(this.parentClass, { [mergeType]: mergeSchema })
 
 		return declare ? this.parentClass : this
 	}

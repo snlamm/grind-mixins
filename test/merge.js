@@ -2,9 +2,10 @@ import test from 'ava'
 import 'Helpers/merge/AnimalClass'
 import 'Helpers/merge/LandAnimalTraits'
 import 'Helpers/merge/WaterAnimalTraits'
-import { mix } from 'Src'
+import 'Helpers/merge/MergeSchema'
+import { mix, Mixin } from 'Src'
 
-test('alligator', t => {
+test('merge methods', t => {
 	const animal = new AnimalClass()
 	const alligator = mix(animal)
 	.mergeOver([
@@ -27,4 +28,14 @@ test('alligator', t => {
 	t.is(alligator.catchAnimal('tuna'), 'Yummy tuna')
 	t.is(alligator.transitionToLand(), 'Swims toward the shore, then walks')
 	t.deepEqual(alligator.environments([ ]), [ 'rivers', 'grasslands' ])
+})
+
+test('merge schema', t => {
+	const alligator = new AnimalClass()
+
+	Mixin.structure(alligator, MergeSchema)
+
+	t.is(alligator.run(), 'Can`t run')
+	t.is(alligator.runs(null, 'bushes'), 'Runs toward the bushes')
+	t.is(alligator.transitionToLand(), 'Can`t swim, then walks. Then: Runs toward the horizon')
 })
