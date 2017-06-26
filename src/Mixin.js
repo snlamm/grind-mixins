@@ -197,29 +197,30 @@ export class Mixin {
 				this._validateMethodUsage(mixin, targetPropertyName, hasProperty, isHook, isOverride, missingDependents)
 
 				Object.defineProperty(target, targetPropertyName, {
-					value: async function(...args) {
+					value: function(...args) {
 						if(!isHook && !isOverride) {
 							return mixinPropertyCall.apply(this, args)
 						} else if(!isHook && isOverride) {
 							return mixinPropertyCall.call(this, targetPropertyCall.bind(this), ...args)
 						} else if(options.before) {
 							if(options.promisify) {
-								await mixinPropertyCall.apply(this, args)
-							} else {
-								mixinPropertyCall.apply(this, args)
+								return Mixin._promisifyPrepend.call(
+									this, mixinPropertyCall, targetPropertyCall, ...args
+								)
 							}
+
+							mixinPropertyCall.apply(this, args)
 
 							return targetPropertyCall.apply(this, args)
 						} else if(options.after) {
-							let value = null
-
 							if(options.promisify) {
-								value = await targetPropertyCall.apply(this, args)
-								await mixinPropertyCall.apply(this, args)
-							} else {
-								value = targetPropertyCall.apply(this, args)
-								mixinPropertyCall.apply(this, args)
+								return Mixin._promisifyAppend.call(
+									this, mixinPropertyCall, targetPropertyCall, ...args
+								)
 							}
+
+							const value = targetPropertyCall.apply(this, args)
+							mixinPropertyCall.apply(this, args)
 
 							return value
 						}
@@ -228,6 +229,19 @@ export class Mixin {
 				})
 			}
 		}
+	}
+
+	static async _promisifyPrepend(mixinPropertyCall, targetPropertyCall, ...args) {
+		await mixinPropertyCall.apply(this, args)
+
+		return targetPropertyCall.apply(this, args)
+	}
+
+	static async _promisifyAppend(mixinPropertyCall, targetPropertyCall, ...args) {
+		const value =  await targetPropertyCall.apply(this, args)
+		await mixinPropertyCall.apply(this, args)
+
+		return value
 	}
 
 	static _validateMethodUsage(mixin, property, hasProperty, isHook, isOverride, missingDependents) {
@@ -273,58 +287,62 @@ export class Mixin {
 		}, this.parentClass)
 	}
 
-	_merge(mergeSchema, declare = false) {
-		this.constructor._structure(this.parentClass, mergeSchema)
+	_merge(mergeType, mergeSchema, declare = false) {
+		if(!Array.isArray(mergeSchema)) {
+			mergeSchema = [ mergeSchema ]
+		}
+
+		this.constructor._structure(this.parentClass, { [mergeType]: mergeSchema })
 
 		return declare ? this.parentClass : this
 	}
 
 	merge(mergeSchema) {
-		return this._merge({ merge: [ mergeSchema ] })
+		return this._merge('merge', mergeSchema)
 	}
 
 	mergeAndDeclare(mergeSchema) {
-		return this._merge({ merge: [ mergeSchema ] }, true)
+		return this._merge('merge', mergeSchema, true)
 	}
 
 	mergeOver(mergeSchema) {
-		return this._merge({ mergeOver: [ mergeSchema ] })
+		return this._merge('mergeOver', mergeSchema)
 	}
 
 	mergeOverAndDeclare(mergeSchema) {
-		return this._merge({ mergeOver: [ mergeSchema ] }, true)
+		return this._merge('mergeOver', mergeSchema, true)
 	}
 
 	prepend(mergeSchema) {
-		return this._merge({ prepend: [ mergeSchema ] })
+		return this._merge('prepend', mergeSchema)
 	}
 
 	prependAndDeclare(mergeSchema) {
-		return this._merge({ prepend: [ mergeSchema ] }, true)
+		return this._merge('prepend', mergeSchema, true)
 	}
 
 	awaitPrepend(mergeSchema) {
-		return this._merge({ awaitPrepend: [ mergeSchema ] })
+		return this._merge('awaitPrepend', mergeSchema)
 	}
 
 	awaitPrependAndDeclare(mergeSchema) {
-		return this._merge({ awaitPrepend: [ mergeSchema ] }, true)
+		return this._merge('awaitPrepend', mergeSchema, true)
 	}
 
 	append(mergeSchema) {
-		return this._merge({ append: [ mergeSchema ] })
+		return this._merge('append', mergeSchema)
 	}
 
 	appendAndDeclare(mergeSchema) {
-		return this._merge({ append: [ mergeSchema ] }, true)
+		return this._merge('append', mergeSchema, true)
 	}
 
 	awaitAppend(mergeSchema) {
-		return this._merge({ awaitAppend: [ mergeSchema ] })
+		return this._merge('awaitAppend', mergeSchema)
 	}
 
 	awaitAppendAndDeclare(mergeSchema) {
-		return this._merge({ awaitAppend: [ mergeSchema ] }, true)
+		return this._merge('awaitAppend', mergeSchema, true)
 	}
 
 }
