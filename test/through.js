@@ -1,8 +1,6 @@
 import test from 'ava'
-import 'Helpers/inheritance/ExtendedClassAnimal'
-import 'Helpers/inheritance/ChainSimpleBird'
-import 'Helpers/inheritance/ChainComplexPredator'
 import { mix } from 'Src'
+import { ExtendedClassAnimal, ChainSimpleBird, ChainComplexPredator  } from 'Helpers/inheritance'
 
 
 test('baseAndExtended', t => {

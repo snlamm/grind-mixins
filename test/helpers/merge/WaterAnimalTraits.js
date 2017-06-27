@@ -16,9 +16,13 @@ export const WaterAnimalTraits = {
 	},
 
 	transitionToLand: {
-		action() {
+		action(swimMethod, walkMethod) {
+			if(!swimMethod.isNil && !walkMethod.isNil) {
+				return `${this[swimMethod]('shore')}, then ${this[walkMethod]()}`
+			}
+
 			return `${this.swim('shore')}, then ${this.walk()}`
 		},
-		depends: [ 'walk' ]
+		depends: [ 'walk', 'swim' ]
 	}
 }

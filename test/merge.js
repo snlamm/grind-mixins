@@ -1,9 +1,12 @@
 import test from 'ava'
-import 'Helpers/merge/AnimalClass'
-import 'Helpers/merge/LandAnimalTraits'
-import 'Helpers/merge/WaterAnimalTraits'
-import 'Helpers/merge/MergeSchema'
-import { mix, Mixin } from 'Src'
+import { mix, Mixin, MixinError } from 'Src'
+import {
+	AnimalClass,
+	LandAnimalTraits,
+	WaterAnimalTraits,
+	MergeSchema,
+	ErrorMergeSchema
+} from 'Helpers/merge'
 
 test('merge methods', t => {
 	const animal = new AnimalClass()
@@ -38,4 +41,11 @@ test('merge schema', t => {
 	t.is(alligator.run(), 'Can`t run')
 	t.is(alligator.runs(null, 'bushes'), 'Runs toward the bushes')
 	t.is(alligator.transitionToLand(), 'Can`t swim, then walks. Then: Runs toward the horizon')
+})
+
+test('error merge schema', t => {
+	const alligator = new AnimalClass()
+
+	const error = t.throws(() => Mixin.structure(alligator, ErrorMergeSchema), MixinError)
+	t.is(error.message, 'Mixin transition:  Missing dependents for \'transitionToLand\': [ transitionToLand ]. ')
 })
