@@ -89,6 +89,7 @@ export class Mixin {
 	}
 
 	static _structureMixinObject(mixin, usesPrototype = false) {
+		mixin = { ...mixin }
 		const mixinName = Object.keys(mixin)[0]
 
 		const overrideDepends = mixin.overrideDepends
@@ -111,7 +112,7 @@ export class Mixin {
 
 		const use = mixin.use
 
-		mixin = { name: mixinName, keys: Object.keys(mixin[mixinName]), logic: mixin[mixinName] }
+		mixin = { name: mixinName, keys: Object.keys(mixin[mixinName]), logic: { ...mixin[mixinName] } }
 
 		if(!use.isNil) {
 			mixin.use = use
@@ -137,6 +138,8 @@ export class Mixin {
 			throw new MixinError(`mixin ${mixinName} is not registered`)
 		}
 
+		foundMixin.logic = { ...foundMixin.logic }
+
 		if(hasUseField) {
 			foundMixin.use = mixin.slice(mixin.indexOf('(') + 1, -1).split(', ')
 		}
@@ -157,7 +160,7 @@ export class Mixin {
 
 		for(const override of overrides) {
 			const [ key, dependents ] = override.split(':[')
-			let target = mixin.logic[key]
+			let target =  { ...mixin.logic[key] }
 
 			if(target.isNil) {
 				throw new MixinError(`Invalid dependency override: mixin logic ${key} does not exist`)
@@ -168,6 +171,7 @@ export class Mixin {
 				mixin.logic[key] = target
 			} else if(typeof target === 'object') {
 				target.depends = dependents.split(',')
+				mixin.logic[key] = target
 			}
 		}
 	}

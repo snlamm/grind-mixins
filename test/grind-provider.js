@@ -1,13 +1,13 @@
 import test from 'ava'
-import { MixinProvider } from 'Src'
+import { MixinProvider, MixinError } from 'Src'
 import { Grind } from 'grind-framework'
 import { ExtendedClassAnimal, ChainSimpleBird, ChainComplexPredator  } from 'Helpers/inheritance'
 import {
 	AnimalClass,
 	LandAnimalTraits,
 	WaterAnimalTraits,
-	// MergeSchema,
-	// ErrorMergeSchema
+	MergeSchema,
+	ErrorMergeSchema
 } from 'Helpers/merge'
 
 test.beforeEach(t => {
@@ -78,7 +78,6 @@ test('register', t => {
 	}
 
 	t.context.app.mixins.register(AlligatorClass)
-
 	const alligator = new AlligatorClass()
 
 	t.is(alligator.run('bushes'), 'Runs toward the bushes')
@@ -86,4 +85,33 @@ test('register', t => {
 	t.is(alligator.transitionToLand('swim', 'walkSlow'), 'Swims toward the shore, then walks')
 	t.throws(() => alligator.walk(), TypeError)
 	t.is(AlligatorClass.hunt(), 'Looks in the bushes')
+})
+
+test('register prebuild schema', t => {
+	t.context.app.mixins.buildMerge('LandAnimal', LandAnimalTraits)
+	t.context.app.mixins.buildMerge('WaterAnimal', WaterAnimalTraits)
+
+	class AlligatorClass extends AnimalClass {
+		static mergeMixins = { onPrototype: MergeSchema }
+	}
+
+	t.context.app.mixins.register(AlligatorClass)
+	const alligator = new AlligatorClass()
+
+	t.is(alligator.run(), 'Can`t run')
+	t.is(alligator.runs(null, 'bushes'), 'Runs toward the bushes')
+	t.is(alligator.transitionToLand(), 'Can`t swim, then walks. Then: Runs toward the horizon')
+})
+
+test('register prebuild schema error', t => {
+	t.context.app.mixins.buildMerge('LandAnimal', LandAnimalTraits)
+	t.context.app.mixins.buildMerge('WaterAnimal', WaterAnimalTraits)
+
+	class AlligatorClass extends AnimalClass {
+		static mergeMixins = { onPrototype: ErrorMergeSchema }
+	}
+
+	const error = t.throws(() => t.context.app.mixins.register(AlligatorClass), MixinError)
+	// eslint-disable-next-line max-len
+	t.is(error.message, 'Mixin transition:  Missing dependents for \'transitionToLand\': [ transitionToLand ]. Note: if using prototype, dependents must represent functions.')
 })
