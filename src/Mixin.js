@@ -21,6 +21,10 @@ export class Mixin {
 			name = name.name
 		}
 
+		if(name.isNil || name === '') {
+			throw new MixinError('Mixin missing name: cannot generate default name')
+		}
+
 		if(this.mixins[name]) {
 			throw new MixinError(`Invalid mixin name: ${name} already exists`)
 		}
@@ -86,6 +90,8 @@ export class Mixin {
 		if(usesPrototype) {
 			mixinName =  Object.keys(mixin.prototype)[0]
 			mixin = mixin.prototype
+		} else if(typeof mixin[mixinName] === 'string') {
+			mixin = mixin[mixinName]
 		}
 
 		if(typeof mixin === 'string') {
@@ -129,7 +135,7 @@ export class Mixin {
 		}
 
 		if(hasUseField) {
-			foundMixin.use = mixin.slice(mixin.indexOf('(') + 1, -1).split(',')
+			foundMixin.use = mixin.slice(mixin.indexOf('(') + 1, -1).split(', ')
 		}
 
 		if(usesPrototype) {
@@ -167,7 +173,7 @@ export class Mixin {
 		const isOverride = options.override
 		const isHook = options.before || options.after
 
-		for(const mixin of mixins) {
+		for(const { ...mixin } of mixins) {
 			const target = mixin.usesPrototype ? targetClass.prototype : targetClass
 			const aliases = { }
 			const unusedRestrictions = (mixin.use || [ ]).filter(restriction => {
@@ -283,12 +289,14 @@ export class Mixin {
 
 	through(...mixins) {
 		return mixins.reduce((chain, mixin) => {
+			const name = mixin
+
 			if(typeof mixin === 'string') {
 				mixin = this.constructor.mixins[mixin]
 			}
 
 			if(typeof mixin !== 'function') {
-				throw new MixinError(`Mixin must be a function or a string assigned through buildChain(): ${mixin}`)
+				throw new MixinError(`Unable to find Mixin: ${name}. Must be function or string assigned in builder`)
 			}
 
 			return mixin(chain)
