@@ -11,8 +11,9 @@ export class Mixin {
 		prepend: { before: true },
 		awaitPrepend: { before: true, promisify: true },
 		append: { after: true },
-		awaitAppend: { after: true, promisify: true }
+		awaitAppend: { after: true, promisify: true },
 	}
+	static prototypeType = 'onPrototype'
 
 	static buildChain(name, mixin) {
 		// can optionally pass in the function only and we'll attempt to derive the mixin name
@@ -48,7 +49,7 @@ export class Mixin {
 		}
 	}
 
-	static register(targetClass, methodName = 'mergeMixin') {
+	static register(targetClass, methodName = 'mergeMixins') {
 		const mergeSchema = targetClass[methodName]
 
 		if(mergeSchema.isNil || (typeof mergeSchema !== 'object')) {
@@ -58,9 +59,14 @@ export class Mixin {
 		return this.structure(targetClass, mergeSchema)
 	}
 
-	static structure(target, mergeSchema) {
+	static structure(target, mergeSchema, usesPrototype = false) {
 		for(const [ mergeMethod, mixins ] of Object.entries(mergeSchema)) {
 			const type = mergeMethod.split(/\d+$/)[0]
+
+			if(type === this.prototypeType) {
+				this.structure(target, mergeSchema[mergeMethod], true)
+				continue
+			}
 
 			if(!Object.keys(this.mergeTypes).includes(type)) {
 				throw new MixinError(`Unkown merge type: ${type}. Must be ${Object.keys(this.mergeTypes).join(', ')}`)
@@ -72,9 +78,9 @@ export class Mixin {
 				const type = typeof mixin
 
 				if(type === 'object') {
-					return this._structureMixinObject(mixin)
+					return this._structureMixinObject(mixin, usesPrototype)
 				} else if(type === 'string') {
-					return this._structureMixinString(mixin)
+					return this._structureMixinString(mixin, usesPrototype)
 				}
 			})
 
@@ -82,15 +88,12 @@ export class Mixin {
 		}
 	}
 
-	static _structureMixinObject(mixin) {
-		let mixinName = Object.keys(mixin)[0]
-		const usesPrototype = mixinName === 'prototype'
+	static _structureMixinObject(mixin, usesPrototype = false) {
+		const mixinName = Object.keys(mixin)[0]
+
 		const overrideDepends = mixin.overrideDepends
 
-		if(usesPrototype) {
-			mixinName =  Object.keys(mixin.prototype)[0]
-			mixin = mixin.prototype
-		} else if(typeof mixin[mixinName] === 'string') {
+		if(typeof mixin[mixinName] === 'string') {
 			mixin = mixin[mixinName]
 		}
 
@@ -128,9 +131,9 @@ export class Mixin {
 	static _structureMixinString(mixin, usesPrototype = false, overrideDepends) {
 		const hasUseField = /\(/.test(mixin)
 		const mixinName = hasUseField ? mixin.slice(0, mixin.indexOf('(')) : mixin
-		const foundMixin = this.mixins[mixinName]
+		const foundMixin = { ...this.mixins[mixinName] }
 
-		if(foundMixin.isNil) {
+		if(foundMixin.isNil || Object.keys(foundMixin).length === 0) {
 			throw new MixinError(`mixin ${mixinName} is not registered`)
 		}
 
@@ -198,7 +201,6 @@ export class Mixin {
 				const targetPropertyName = aliases[property] || property
 				const targetPropertyCall = target[targetPropertyName]
 				let mixinPropertyCall =  mixin.logic[property]
-				// let dependents = null
 				let missingDependents = null
 
 				if(typeof mixinPropertyCall === 'object') {
@@ -282,9 +284,11 @@ export class Mixin {
 	}
 
 	parentClass = null
+	usesPrototype = null
 
-	constructor(parentClass) {
+	constructor(parentClass, usesPrototype = false) {
 		this.parentClass = parentClass
+		this.usesPrototype = usesPrototype
 	}
 
 	through(...mixins) {
@@ -308,7 +312,13 @@ export class Mixin {
 			mergeSchema = [ mergeSchema ]
 		}
 
-		this.constructor.structure(this.parentClass, { [mergeType]: mergeSchema })
+		mergeSchema = { [mergeType]: mergeSchema }
+
+		if(this.usesPrototype) {
+			mergeSchema = { onPrototype: mergeSchema }
+		}
+
+		this.constructor.structure(this.parentClass, mergeSchema)
 
 		return declare ? this.parentClass : this
 	}
@@ -359,6 +369,12 @@ export class Mixin {
 
 	awaitAppendAndDeclare(mergeSchema) {
 		return this._merge('awaitAppend', mergeSchema, true)
+	}
+
+	onPrototype(cb) {
+		cb(new Mixin(this.parentClass, true))
+
+		return this
 	}
 
 }

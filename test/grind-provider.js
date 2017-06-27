@@ -19,6 +19,10 @@ test.beforeEach(t => {
 	t.context.app = app
 })
 
+test.afterEach(t => {
+	t.context.app.mixins.mixins = { }
+})
+
 test('Build Inheritance Chain', t => {
 	t.context.app.mixins.buildChain('Bird', ChainSimpleBird)
 	t.context.app.mixins.buildChain('Predator', ChainComplexPredator)
@@ -39,8 +43,8 @@ test('Build Merge', t => {
 	const alligator = t.context.app.mixins.mix(new AnimalClass())
 	.mergeOver([ 'WaterAnimal(swim)', 'LandAnimal(run)' ])
 	.mergeAndDeclare([
-		{ HuntWalkAsSlow: 'LandAnimal(hunt, walk as walkSlow)' },
-		{ WaterTransition: 'WaterAnimal(transitionToLand)', overrideDepends: 'transitionToLand:[swim,walkSlow]' }
+		'LandAnimal(hunt, walk as walkSlow)',
+		{ string: 'WaterAnimal(transitionToLand)', overrideDepends: 'transitionToLand:[swim,walkSlow]' }
 	])
 
 	t.is(alligator.swim('logs'), 'Swims toward the logs')
@@ -48,4 +52,38 @@ test('Build Merge', t => {
 	t.is(alligator.walkSlow(), 'walks')
 	t.is(alligator.transitionToLand('swim', 'walkSlow'), 'Swims toward the shore, then walks')
 	t.throws(() => alligator.walk(), TypeError)
+})
+
+test('register', t => {
+	t.context.app.mixins.buildMerge('LandAnimal', LandAnimalTraits)
+	t.context.app.mixins.buildMerge('WaterAnimal', WaterAnimalTraits)
+
+	class AlligatorClass extends AnimalClass {
+		static mergeMixins = {
+			onPrototype: {
+				mergeOver: [
+					'LandAnimal(run)',
+					'WaterAnimal(swim)',
+				],
+				merge: [ 'LandAnimal(hunt, walk as walkSlow)' ]
+			},
+			onPrototype2: {
+				merge: [
+					{ string: 'WaterAnimal(transitionToLand)',
+					overrideDepends: 'transitionToLand:[swim,walkSlow]' }
+				]
+			},
+			merge: [ 'LandAnimal(hunt)' ]
+		}
+	}
+
+	t.context.app.mixins.register(AlligatorClass)
+
+	const alligator = new AlligatorClass()
+
+	t.is(alligator.run('bushes'), 'Runs toward the bushes')
+	t.is(alligator.walkSlow(), 'walks')
+	t.is(alligator.transitionToLand('swim', 'walkSlow'), 'Swims toward the shore, then walks')
+	t.throws(() => alligator.walk(), TypeError)
+	t.is(AlligatorClass.hunt(), 'Looks in the bushes')
 })

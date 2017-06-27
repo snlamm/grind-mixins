@@ -33,6 +33,38 @@ test('merge methods', t => {
 	t.deepEqual(alligator.environments([ ]), [ 'rivers', 'grasslands' ])
 })
 
+test('prototype method', t => {
+	class AlligatorClass extends AnimalClass { }
+
+	mix(AlligatorClass)
+	.onPrototype(builder => {
+		builder.mergeOver([
+			{ LandAnimalTraits, use: [ 'run' ] },
+			{ WaterAnimalTraits, use: [ 'swim' ] }
+		])
+		builder.merge(
+			{ LandAnimalTraits, use: [ 'catchAnimal', 'walk' ] }
+		)
+		builder.merge(
+			{ WaterAnimalTraits, use: [ 'transitionToLand' ] }
+		)
+		builder.prependAndDeclare([
+			{ LandAnimalTraits, use: [ 'environments' ] },
+			{ WaterAnimalTraits, use: [ 'environments' ] }
+		])
+	})
+	.merge({ LandAnimalTraits, use: [ 'hunt' ] })
+
+	const alligator = new AlligatorClass()
+
+	t.is(alligator.run('bushes'), 'Runs toward the bushes')
+	t.is(alligator.swim('logs'), 'Swims toward the logs')
+	t.is(alligator.catchAnimal('tuna'), 'Yummy tuna')
+	t.is(alligator.transitionToLand(), 'Swims toward the shore, then walks')
+	t.deepEqual(alligator.environments([ ]), [ 'rivers', 'grasslands' ])
+	t.is(AlligatorClass.hunt(), 'Looks in the bushes')
+})
+
 test('merge schema', t => {
 	const alligator = new AnimalClass()
 
