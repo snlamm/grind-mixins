@@ -50,7 +50,11 @@ export class Mixin {
 	}
 
 	static register(targetClass, methodName = 'mergeMixins') {
-		const mergeSchema = targetClass[methodName]
+		let mergeSchema = targetClass[methodName]
+
+		if(typeof mergeSchema === 'function') {
+			mergeSchema = mergeSchema()
+		}
 
 		if(mergeSchema.isNil || (typeof mergeSchema !== 'object')) {
 			throw new MixinError(`Failed to register: missing mergeSchema method: ${methodName}`)
@@ -265,12 +269,12 @@ export class Mixin {
 	}
 
 	static _validateMethodUsage(mixin, property, hasProperty, isHook, isOverride, missingDependents) {
-		const name = `Mixin ${mixin.name}: `
+		const name = `Mixin ${mixin.name}:`
 		if(!missingDependents.isNil && missingDependents.length > 0) {
-			const addendum = mixin.usesPrototype ? 'Note: if using prototype, dependents must represent functions.' : ''
+			const addendum = mixin.usesPrototype ? ' Note: if using prototype, dependents must represent functions' : ''
 
 			throw new MixinError(
-				`${name} Missing dependents for '${property}': [ ${missingDependents.join(', ')} ]. ${addendum}`
+				`${name} Missing dependents for '${property}': [ ${missingDependents.join(', ')} ].${addendum}`
 			)
 		}
 
@@ -295,10 +299,16 @@ export class Mixin {
 		this.usesPrototype = usesPrototype
 	}
 
-	structure(mergeSchema, targetClass = null) {
-		const target = targetClass || this.parentClass
+	structure(mergeSchema) {
+		this.constructor.structure(this.parentClass, mergeSchema)
 
-		return this.constructor.structure(target, mergeSchema)
+		return this
+	}
+
+	register(methodName = 'mergeMixins') {
+		this.constructor.register(this.parentClass, methodName)
+
+		return this
 	}
 
 	through(...mixins) {

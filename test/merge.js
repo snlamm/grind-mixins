@@ -78,5 +78,5 @@ test('error merge schema', t => {
 	const alligator = new AnimalClass()
 
 	const error = t.throws(() => Mixin.structure(alligator, ErrorMergeSchema), MixinError)
-	t.is(error.message, 'Mixin transition:  Missing dependents for \'transitionToLand\': [ transitionToLand ]. ')
+	t.is(error.message, 'Mixin transition: Missing dependents for \'transitionToLand\': [ transitionToLand ].')
 })

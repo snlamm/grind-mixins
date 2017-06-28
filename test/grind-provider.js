@@ -113,5 +113,5 @@ test('register prebuild schema error', t => {
 
 	const error = t.throws(() => t.context.app.mixins.register(AlligatorClass), MixinError)
 	// eslint-disable-next-line max-len
-	t.is(error.message, 'Mixin transition:  Missing dependents for \'transitionToLand\': [ transitionToLand ]. Note: if using prototype, dependents must represent functions.')
+	t.is(error.message, 'Mixin transition: Missing dependents for \'transitionToLand\': [ transitionToLand ]. Note: if using prototype, dependents must represent functions')
 })
