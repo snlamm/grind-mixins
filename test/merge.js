@@ -67,8 +67,7 @@ test('prototype method', t => {
 
 test('merge schema', t => {
 	const alligator = new AnimalClass()
-
-	Mixin.structure(alligator, MergeSchema)
+	mix(alligator).structure(MergeSchema)
 
 	t.is(alligator.run(), 'Can`t run')
 	t.is(alligator.runs(null, 'bushes'), 'Runs toward the bushes')

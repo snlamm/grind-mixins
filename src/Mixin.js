@@ -295,6 +295,12 @@ export class Mixin {
 		this.usesPrototype = usesPrototype
 	}
 
+	structure(mergeSchema, targetClass = null) {
+		const target = targetClass || this.parentClass
+
+		return this.constructor.structure(target, mergeSchema)
+	}
+
 	through(...mixins) {
 		return mixins.reduce((chain, mixin) => {
 			const name = mixin
