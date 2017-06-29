@@ -1,12 +1,10 @@
-
-- widgets (like travis)
-
-
 # plugin-grind-mixins
+
+<a href="https://travis-ci.org/snlamm/grind-mixins"><img src="https://travis-ci.org/snlamm/grind-mixins.svg?branch=master" alt="Build Status"></a>
 
 Plugin Grind Mixins is a tool for building ES6 class mixins that are fast, flexible, and free of dependency confusion. It is inspired by [Grind Framework](https://grind.rocks/) and has a handy interface for Grind projects. Note that features can be used as well in non-Grind projects.
 
-Plugin Grind Mixins, internally, is built using mixin patterns suggested by [Raganwald](http://raganwald.com/2015/12/31/this-is-not-an-essay-about-traits-in-javascript.html) and [justinfagnani](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/), however it provides a much different, convenient interface.
+Plugin Grind Mixins, internally, is built using mixin patterns suggested by [Raganwald](http://raganwald.com/2015/12/31/this-is-not-an-essay-about-traits-in-javascript.html) and [justinfagnani](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/), however it provides a much different interface.
 
 <!-- TOC depthFrom:2 depthTo:4 withLinks:1 updateOnSave:1 orderedList:0 -->
 
@@ -48,7 +46,7 @@ npm install --save plugin-grind-mixins
 plugin-grind-mixins grants access to two types mixins: Inheritance and Merge. They can be used together, though they work quite differently.
 
 ## Inheritance Mixins
-Inheritance mixins are added to the inheritance chain of a class. Because they use inhertiance, these mixins can use `super()` (unlike Merge mixins or attributes added through `Object.assign()` and the like).
+Inheritance mixins are added to the inheritance chain of a class. Because they use inheritance, these mixins can use `super()` (unlike Merge mixins or attributes added through `Object.assign()` and the like).
 
 ### Building Inheritance Mixins
 Build the mixin by pointing a function at the class you want to mix in:
@@ -115,19 +113,26 @@ Mixins are applied in order of entry, so Bird is a base class for Predator. Thus
 ## Merge Mixins
 Merge mixins add properties directly onto a declared class or class prototype. Note that they do not work through inheritance and, therefore, cannot use `super()`.
 
-Example of using Merge mixins through a [JSON Schema](#mergeschema-via-a-json-schema):
+Example of using Merge mixins through a [JSON MergeSchema](#mergeschema-via-a-json-schema):
 ```js
-import { mix } from 'plugin-grind-mixins'
+// AnimalMixins.js
 
-const WaterTraits = {
+export const WaterTraits = {
 	swim(location) { return `Swims toward the ${location}` },
 	huntFish() { return 'Eating Fish' }
 	breathThroughGills() { return 'Breathing through gills' }
 }
 
-const LandTraits = {
+export const LandTraits = {
 	run(location) { return `Runs toward the ${location}` }
 }
+```
+
+```js
+// Alligator.js
+
+import { mix } from 'plugin-grind-mixins'
+import { WaterTraits, LandTraits } from 'AnimalMixins'
 
 class Alligator {
 	static mergeMixins() {
