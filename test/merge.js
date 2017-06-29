@@ -48,7 +48,7 @@ test('prototype method', t => {
 		builder.merge(
 			{ WaterAnimalTraits, use: [ 'transitionToLand' ] }
 		)
-		builder.prependAndDeclare([
+		builder.prepend([
 			{ LandAnimalTraits, use: [ 'environments' ] },
 			{ WaterAnimalTraits, use: [ 'environments' ] }
 		])
