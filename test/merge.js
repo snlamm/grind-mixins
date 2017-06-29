@@ -65,13 +65,17 @@ test('prototype method', t => {
 	t.is(AlligatorClass.hunt(), 'Looks in the bushes')
 })
 
-test('merge schema', t => {
+test('merge schema usesSchema()', t => {
 	const alligator = new AnimalClass()
-	mix(alligator).structure(MergeSchema)
+	const alligator2 = new AnimalClass()
+	mix(alligator).useSchema(MergeSchema)
 
 	t.is(alligator.run(), 'Can`t run')
 	t.is(alligator.runs(null, 'bushes'), 'Runs toward the bushes')
 	t.is(alligator.transitionToLand(), 'Can`t swim, then walks. Then: Runs toward the horizon')
+
+	const error = t.throws(() => alligator2.runs(null, 'bushes'), TypeError)
+	t.is(error.message, 'alligator2.runs is not a function')
 })
 
 test('error merge schema', t => {

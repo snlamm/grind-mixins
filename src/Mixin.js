@@ -299,7 +299,7 @@ export class Mixin {
 		this.usesPrototype = usesPrototype
 	}
 
-	structure(mergeSchema) {
+	useSchema(mergeSchema) {
 		this.constructor.structure(this.parentClass, mergeSchema)
 
 		return this
