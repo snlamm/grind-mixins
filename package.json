@@ -1,44 +1,44 @@
 {
-	"name": "plugin-grind-mixins",
-	"version": "0.1.0",
-	"description": " Mixins provider for Grind Framework",
-	"author": "Shmuel Lamm (@snlamm)",
-	"license": "MIT",
-	"main": "lib/index.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/snlamm/grind-mixins.git"
-	},
-	"devDependencies": {
-		"ava": "^0.20.0",
-		"babel-cli": ">=6.7 <=7.0",
-		"babel-eslint": "^7.2.3",
-		"babel-plugin-module-resolver": "^2.7.1",
-		"babel-preset-grind": "^0.6.3",
-		"eslint": "3.3",
-		"eslint-config-grind": "^2.0.0",
-		"eslint-plugin-import-auto-name": "^1.0.3",
-		"grind-framework": "0.7.0-beta.5"
-	},
-	"keywords": [
-		"grindjs",
-		"grind-framework",
-		"mixins",
-		"traits"
-	],
-	"engines": {
-		"node": ">=6.9"
-	},
-	"scripts": {
-		"prepublish": "bin/build",
-		"lint": "eslint src",
-		"test": "bin/ava --verbose"
-	},
-	"ava": {
-		"require": [
-			"babel-register",
-			"babel-polyfill"
-		],
-		"babel": "inherit"
-	}
+  "name": "plugin-grind-mixins",
+  "version": "0.1.1",
+  "description": " Mixins provider for Grind Framework",
+  "author": "Shmuel Lamm (@snlamm)",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snlamm/grind-mixins.git"
+  },
+  "devDependencies": {
+    "ava": "^0.20.0",
+    "babel-cli": ">=6.7 <=7.0",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-module-resolver": "^2.7.1",
+    "babel-preset-grind": "^0.6.3",
+    "eslint": "3.3",
+    "eslint-config-grind": "^2.0.0",
+    "eslint-plugin-import-auto-name": "^1.0.3",
+    "grind-framework": "0.7.0-beta.5"
+  },
+  "keywords": [
+    "grindjs",
+    "grind-framework",
+    "mixins",
+    "traits"
+  ],
+  "engines": {
+    "node": ">=6.9"
+  },
+  "scripts": {
+    "prepublish": "bin/build",
+    "lint": "eslint src",
+    "test": "bin/ava --verbose"
+  },
+  "ava": {
+    "require": [
+      "babel-register",
+      "babel-polyfill"
+    ],
+    "babel": "inherit"
+  }
 }
