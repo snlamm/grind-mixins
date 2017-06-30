@@ -8,7 +8,7 @@ import {
 	ErrorMergeSchema
 } from 'Helpers/merge'
 
-test('merge methods', t => {
+test('basic merge methods', t => {
 	const animal = new AnimalClass()
 	const alligator = mix(animal)
 	.mergeOver([
@@ -33,7 +33,7 @@ test('merge methods', t => {
 	t.deepEqual(alligator.environments([ ]), [ 'rivers', 'grasslands' ])
 })
 
-test('Promisified prepend methods', async t => {
+test('promisified prepend methods', async t => {
 	class Alligator {
 		awaitMeals(meals = [ ]) {
 			meals.push('cod')
@@ -61,7 +61,7 @@ test('Promisified prepend methods', async t => {
 	t.is(round2[1], 'tuna')
 })
 
-test('Promisified append methods', async t => {
+test('promisified append methods', async t => {
 	class Alligator {
 		awaitMeals(meals = [ ]) {
 			meals.push('cod')
@@ -114,7 +114,7 @@ test('promisified prepend and append together', async t => {
 	t.is(meals[2], 'tuna')
 })
 
-test('Using non-existing merge object trats', t => {
+test('Using non-existing merge object traits', t => {
 	const animal = new AnimalClass()
 
 	t.throws(() => {
@@ -151,7 +151,7 @@ test('Merge using overrideDepends', t => {
 	t.is(alligator.catchFish('tuna'), 'Yummy tuna')
 })
 
-test('Merge using invalid overrideDepends', t => {
+test('merge using invalid overrideDepends', t => {
 	class Alligator {
 		hasTeeth() { return 'true' }
 	}
@@ -198,7 +198,7 @@ test('prototype method', t => {
 	t.is(AlligatorClass.hunt(), 'Looks in the bushes')
 })
 
-test('merge schema usesSchema()', t => {
+test('merge schema on prototype with usesSchema()', t => {
 	const alligator = new AnimalClass()
 	const alligator2 = new AnimalClass()
 	mix(alligator).useSchema(MergeSchema)

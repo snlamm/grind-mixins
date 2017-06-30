@@ -23,7 +23,7 @@ test.afterEach(t => {
 	t.context.app.mixins.mixins = { }
 })
 
-test('Build Inheritance Chain', t => {
+test('build provider inheritance chain', t => {
 	t.context.app.mixins.buildChain('Bird', ChainSimpleBird)
 	t.context.app.mixins.buildChain('Predator', ChainComplexPredator)
 
@@ -36,7 +36,7 @@ test('Build Inheritance Chain', t => {
 	t.is(heron.sound(), 'Screetch')
 })
 
-test('Build Merge', t => {
+test('build provider merges', t => {
 	t.context.app.mixins.buildMerge('LandAnimal', LandAnimalTraits)
 	t.context.app.mixins.buildMerge('WaterAnimal', WaterAnimalTraits)
 
@@ -54,7 +54,7 @@ test('Build Merge', t => {
 	t.throws(() => alligator.walk(), TypeError)
 })
 
-test('register', t => {
+test('register mixins', t => {
 	t.context.app.mixins.buildMerge('LandAnimal', LandAnimalTraits)
 	t.context.app.mixins.buildMerge('WaterAnimal', WaterAnimalTraits)
 

@@ -3,7 +3,7 @@ import { mix } from 'Src'
 import { ExtendedClassAnimal, ChainSimpleBird, ChainComplexPredator  } from 'Helpers/inheritance'
 
 
-test('baseAndExtended', t => {
+test('test base and extended test classes', t => {
 	const Heron = class Heron extends ExtendedClassAnimal {
 		constructor() {
 			super()
@@ -23,7 +23,7 @@ test('baseAndExtended', t => {
 	t.is(heron.findAnimalType(), 'animal')
 })
 
-test('chainSimple', t => {
+test('chain simple inheritance mixins', t => {
 	const Heron = class Heron extends mix(ExtendedClassAnimal).through(ChainSimpleBird) {
 		constructor() {
 			super()
@@ -43,7 +43,7 @@ test('chainSimple', t => {
 	t.is(heron.hunt(), 'Does not hunt')
 })
 
-test('chianComplex', t => {
+test('chain complex inheritance mixins', t => {
 	const Heron = class Heron extends mix(ExtendedClassAnimal).through(ChainSimpleBird, ChainComplexPredator) {
 		constructor() {
 			super()
