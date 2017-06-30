@@ -33,6 +33,117 @@ test('merge methods', t => {
 	t.deepEqual(alligator.environments([ ]), [ 'rivers', 'grasslands' ])
 })
 
+test('Promisified prepend methods', async t => {
+	class Alligator {
+		awaitMeals(meals = [ ]) {
+			meals.push('cod')
+
+			return meals
+		}
+
+	}
+
+	const asyncAlligator = mix(new Alligator())
+	.awaitPrependAndDeclare({ LandAnimalTraits, use: [ 'awaitMeals' ] })
+
+	const alligator = mix(new Alligator())
+	.prependAndDeclare({ LandAnimalTraits, use: [ 'awaitMeals' ] })
+
+	const asyncRound1 = await asyncAlligator.awaitMeals([ ], 'tuna')
+	const asyncRound2 = await asyncAlligator.awaitMeals([ ], 'tuna')
+
+	const round1 = await alligator.awaitMeals([ ], 'tuna')
+	const round2 = await alligator.awaitMeals([ ], 'tuna')
+
+	t.is(asyncRound1[0], 'tuna')
+	t.is(asyncRound2[1], 'cod')
+	t.is(round1[0], 'cod')
+	t.is(round2[1], 'tuna')
+})
+
+test('Promisified append methods', async t => {
+	class Alligator {
+		awaitMeals(meals = [ ]) {
+			meals.push('cod')
+
+			return meals
+		}
+
+	}
+
+	const asyncAlligator = mix(new Alligator())
+	.awaitAppendAndDeclare({ LandAnimalTraits, use: [ 'awaitMeals' ] })
+
+	const alligator = mix(new Alligator())
+	.appendAndDeclare({ LandAnimalTraits, use: [ 'awaitMeals' ] })
+
+	const asyncRoundMeals = await asyncAlligator.awaitMeals([ ], 'tuna')
+	asyncRoundMeals.push('steak')
+
+	const normalRoundMeals = alligator.awaitMeals([ ], 'tuna')
+	normalRoundMeals.push('steak')
+
+	t.is(asyncRoundMeals[0], 'cod')
+	t.is(asyncRoundMeals[1], 'tuna')
+	t.is(asyncRoundMeals[2], 'steak')
+
+	t.is(normalRoundMeals[0], 'cod')
+	t.is(normalRoundMeals[1], 'steak')
+	t.is(normalRoundMeals[2], undefined)
+})
+
+test('Using non-existing merge object trats', t => {
+	const animal = new AnimalClass()
+
+	t.throws(() => {
+		mix(animal)
+		.mergeOverAndDeclare([
+			{ LandAnimalTraits, use: [ 'run, sprint' ] },
+			{ WaterAnimalTraits, use: [ 'swim' ] }
+		])
+	}, MixinError)
+})
+
+test('Merge using un-nested merge object', t => {
+	class Alligator {
+		walk() { return 'Walks' }
+		swim() { return 'Swims' }
+	}
+	const alligator = mix(new Alligator).mergeAndDeclare({ WaterAnimalTraits, use: [ 'transitionToLand' ] })
+
+	t.is(alligator.transitionToLand(), 'Swims, then Walks')
+})
+
+test('Merge using overrideDepends', t => {
+	class Alligator {
+		hasTeeth() { return 'true' }
+	}
+
+	const alligator = mix(new Alligator)
+	.mergeAndDeclare({
+		WaterAnimalTraits,
+		use: [ 'catchFish' ],
+		overrideDepends: 'catchFish:[hasTeeth]'
+	})
+
+	t.is(alligator.catchFish('tuna'), 'Yummy tuna')
+})
+
+test('Merge using invalid overrideDepends', t => {
+	class Alligator {
+		hasTeeth() { return 'true' }
+	}
+
+	t.throws(() => {
+		mix(new Alligator)
+		.mergeAndDeclare({
+			WaterAnimalTraits,
+			use: [ 'catchFish' ],
+			overrideDepends: 'nonExistantFunction:[hasTeeth]'
+		})
+	}, MixinError)
+})
+
 test('prototype method', t => {
 	class AlligatorClass extends AnimalClass { }
 

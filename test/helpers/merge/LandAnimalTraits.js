@@ -1,3 +1,5 @@
+import fs from 'fs'
+
 export const LandAnimalTraits = {
 	run(_, location) {
 		return `Runs toward the ${location}`
@@ -17,5 +19,12 @@ export const LandAnimalTraits = {
 
 	environments(types) {
 		types.push('grasslands')
+	},
+
+	awaitMeals(meals, food) {
+		// make the function asynchronous
+		return Promise.resolve(fs.readdir('./test/helpers/merge')).then(() => {
+			meals.push(food)
+		})
 	}
 }

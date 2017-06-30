@@ -16,12 +16,6 @@ export class Mixin {
 	static prototypeType = 'onPrototype'
 
 	static buildChain(name, mixin) {
-		// can optionally pass in the function only and we'll attempt to derive the mixin name
-		if(typeof name === 'function' && mixin.isNil) {
-			mixin = name
-			name = name.name
-		}
-
 		if(name.isNil || name === '') {
 			throw new MixinError('Mixin missing name: cannot generate default name')
 		}
@@ -52,8 +46,8 @@ export class Mixin {
 	static register(targetClass, methodName = 'mergeMixins') {
 		let mergeSchema = targetClass[methodName]
 
-		if(typeof mergeSchema === 'function') {
-			mergeSchema = mergeSchema()
+		if(typeof targetClass[methodName] === 'function') {
+			mergeSchema = targetClass[methodName]()
 		}
 
 		if(mergeSchema.isNil || (typeof mergeSchema !== 'object')) {
@@ -64,7 +58,8 @@ export class Mixin {
 	}
 
 	static structure(target, mergeSchema, usesPrototype = false) {
-		for(const [ mergeMethod, mixins ] of Object.entries(mergeSchema)) {
+		// eslint-disable-next-line prefer-const
+		for(let [ mergeMethod, mixins ] of Object.entries(mergeSchema)) {
 			const type = mergeMethod.split(/\d+$/)[0]
 
 			if(type === this.prototypeType) {
@@ -77,6 +72,10 @@ export class Mixin {
 			}
 
 			const options = this.mergeTypes[type]
+
+			if(!Array.isArray(mixins) && (typeof mixins === 'object')) {
+				mixins = [ mixins ]
+			}
 
 			const expandedMixins = mixins.map(mixin => {
 				const type = typeof mixin
@@ -164,14 +163,14 @@ export class Mixin {
 
 		for(const override of overrides) {
 			const [ key, dependents ] = override.split(':[')
-			let target =  { ...mixin.logic[key] }
+			let target = typeof mixin.logic[key] === 'function' ? mixin.logic[key] : { ...mixin.logic[key] }
 
-			if(target.isNil) {
+			if(target.isNil || ((typeof target === 'object') && Object.keys(target).length === 0)) {
 				throw new MixinError(`Invalid dependency override: mixin logic ${key} does not exist`)
 			}
 
 			if(typeof target === 'function') {
-				target = { action() { mixin.logic[key] }, depends: dependents.split(',') }
+				target = { action: target, depends: dependents.split(',') }
 				mixin.logic[key] = target
 			} else if(typeof target === 'object') {
 				target.depends = dependents.split(',')
@@ -198,7 +197,7 @@ export class Mixin {
 			})
 
 			if(unusedRestrictions.length > 0) {
-				throw new MixinError(`Invalid export: mixin attributes do not exist: ${unusedRestrictions.join(', ')}`)
+				throw new MixinError(`Attempting to use non-existing mixin traits: ${unusedRestrictions.join(', ')}`)
 			}
 
 			if(Array.isArray(mixin.use) && mixin.use.length > 0) {

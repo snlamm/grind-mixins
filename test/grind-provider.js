@@ -59,21 +59,23 @@ test('register', t => {
 	t.context.app.mixins.buildMerge('WaterAnimal', WaterAnimalTraits)
 
 	class AlligatorClass extends AnimalClass {
-		static mergeMixins = {
-			onPrototype: {
-				mergeOver: [
-					'LandAnimal(run)',
-					'WaterAnimal(swim)',
-				],
-				merge: [ 'LandAnimal(hunt, walk as walkSlow)' ]
-			},
-			onPrototype2: {
-				merge: [
-					{ string: 'WaterAnimal(transitionToLand)',
-					overrideDepends: 'transitionToLand:[swim,walkSlow]' }
-				]
-			},
-			merge: [ 'LandAnimal(hunt)' ]
+		static mergeMixins() {
+			return {
+				onPrototype: {
+					mergeOver: [
+						'LandAnimal(run)',
+						'WaterAnimal(swim)',
+					],
+					merge: [ 'LandAnimal(hunt, walk as walkSlow)' ]
+				},
+				onPrototype2: {
+					merge: [
+						{ string: 'WaterAnimal(transitionToLand)',
+						overrideDepends: 'transitionToLand:[swim,walkSlow]' }
+					]
+				},
+				merge: [ 'LandAnimal(hunt)' ]
+			}
 		}
 	}
 
