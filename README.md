@@ -711,6 +711,6 @@ alligator.run('horizon')
 ## Contributing
 Contributions are always welcome! You are encouraged to open issues and merge requests.
 
-The dev environment and scripts are largely borrowed from Grind Framework, while the README borrows some language from the Grind Docs.
+Much of the dev environment is borrowed from Grind Framework, while the README borrows some language from the Grind Docs.
 
 To run the tests, use `npm run test`.

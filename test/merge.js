@@ -92,6 +92,28 @@ test('Promisified append methods', async t => {
 	t.is(normalRoundMeals[2], undefined)
 })
 
+test('promisified prepend and append together', async t => {
+	class Alligator {
+		awaitMeals(meals = [ ]) {
+			meals.push('cod')
+
+			return meals
+		}
+
+	}
+	const alligator = new Alligator()
+
+	mix(alligator)
+	.awaitAppend({ LandAnimalTraits, use: [ 'awaitMeals' ] })
+	.awaitPrepend({ LandAnimalTraits, use: [ 'awaitMeals' ] })
+
+	const meals = await alligator.awaitMeals([ ], 'tuna')
+
+	t.is(meals[0], 'tuna')
+	t.is(meals[1], 'cod')
+	t.is(meals[2], 'tuna')
+})
+
 test('Using non-existing merge object trats', t => {
 	const animal = new AnimalClass()
 
@@ -194,4 +216,18 @@ test('error merge schema', t => {
 
 	const error = t.throws(() => Mixin.structure(alligator, ErrorMergeSchema), MixinError)
 	t.is(error.message, 'Mixin transition: Missing dependents for \'transitionToLand\': [ transitionToLand ].')
+})
+
+test('register class MergeSchema outside of provider', t => {
+	class Alligator {
+		static mergeMixins = { onPrototype: MergeSchema }
+
+		swim() { return 'Can`t swim' }
+	}
+
+	mix(Alligator).register()
+	const alligator = new Alligator()
+
+	t.is(alligator.runs(null, 'bushes'), 'Runs toward the bushes')
+	t.is(alligator.transitionToLand(), 'Can`t swim, then walks. Then: Runs toward the horizon')
 })

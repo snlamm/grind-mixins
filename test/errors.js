@@ -27,6 +27,13 @@ test('provider build errors', t => {
 	t.throws(() => t.context.app.mixins.buildMerge('LandTraits', LandAnimalTraits), MixinError)
 })
 
+test('register missing mergeSchmea method', t => {
+	class Alligator { }
+
+	const error = t.throws(() => t.context.app.mixins.register(Alligator), MixinError)
+	t.is(error.message, 'Failed to register: missing mergeSchema method: mergeMixins')
+})
+
 test('Unknown merge method type', t => {
 	class Alligator {
 		static mergeMixins = {
