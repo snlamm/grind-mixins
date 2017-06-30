@@ -713,4 +713,4 @@ Contributions are always welcome! You are encouraged to open issues and merge re
 
 The dev environment and scripts are largely borrowed from Grind Framework, while the README borrows some language from the Grind Docs.
 
-To run the tests, use `bin/ava`.
+To run the tests, use `npm run test`.

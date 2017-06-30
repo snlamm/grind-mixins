@@ -15,10 +15,12 @@
     "babel-eslint": "^7.2.3",
     "babel-plugin-module-resolver": "^2.7.1",
     "babel-preset-grind": "^0.6.3",
+    "coveralls": "^2.13.1",
     "eslint": "3.3",
     "eslint-config-grind": "^2.0.0",
     "eslint-plugin-import-auto-name": "^1.0.3",
-    "grind-framework": "0.7.0-beta.5"
+    "grind-framework": "0.7.0-beta.5",
+    "nyc": "^11.0.3"
   },
   "keywords": [
     "grindjs",
@@ -32,7 +34,9 @@
   "scripts": {
     "prepublish": "bin/build",
     "lint": "eslint src",
-    "test": "bin/ava --verbose"
+		"test": "ava --verbose",
+		"test-nyc": "nyc ava --verbose",
+		"coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "ava": {
     "require": [
