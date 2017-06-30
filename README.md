@@ -1,6 +1,9 @@
 # plugin-grind-mixins
 
 <a href="https://travis-ci.org/snlamm/grind-mixins"><img src="https://travis-ci.org/snlamm/grind-mixins.svg?branch=master" alt="Build Status"></a>
+<a href="https://www.npmjs.com/package/plugin-grind-mixins"><img src="https://img.shields.io/gemnasium/mathiasbynens/he.svg" alt="Dependencies"></a>
+<a href="https://www.npmjs.com/package/plugin-grind-mixins"><img src="https://img.shields.io/npm/v/plugin-grind-mixins.svg" alt="NPM Version"></a>
+<a href="https://www.npmjs.com/package/plugin-grind-mixins"><img src="https://img.shields.io/npm/l/plugin-grind-mixins.svg" alt="License"></a>
 
 Plugin Grind Mixins is a tool for building ES6 class mixins that are fast, flexible, and free of dependency confusion. It is inspired by [Grind Framework](https://grind.rocks/) and has a handy interface for Grind projects. Note that features can be used as well in non-Grind projects.
 
@@ -43,7 +46,7 @@ npm install --save plugin-grind-mixins
 ```
 
 ## Types of Mixins
-plugin-grind-mixins grants access to two types mixins: Inheritance and Merge. They can be used together, though they work quite differently.
+plugin-grind-mixins grants access to two types of mixins: Inheritance and Merge. They can be used together, though they work quite differently.
 
 ## Inheritance Mixins
 Inheritance mixins are added to the inheritance chain of a class. Because they use inheritance, these mixins can use `super()` (unlike Merge mixins or attributes added through `Object.assign()` and the like).
@@ -113,18 +116,21 @@ Mixins are applied in order of entry, so Bird is a base class for Predator. Thus
 ## Merge Mixins
 Merge mixins add properties directly onto a declared class or class prototype. Note that they do not work through inheritance and, therefore, cannot use `super()`.
 
-Example of using Merge mixins through a [JSON MergeSchema](#mergeschema-via-a-json-schema):
+Example that shows a number of Merge mixins (through a [JSON MergeSchema](#mergeschema-via-a-json-schema)):
 ```js
 // AnimalMixins.js
 
 export const WaterTraits = {
 	swim(location) { return `Swims toward the ${location}` },
-	huntFish() { return 'Eating Fish' }
+	huntFish() { return 'Hunting Fish' },
+	eatFish(number) { /* code to asynchronously update model with the number of total fish eaten */ },
+	environments(types) { types.push('rivers') },
 	breathThroughGills() { return 'Breathing through gills' }
 }
 
 export const LandTraits = {
-	run(location) { return `Runs toward the ${location}` }
+	run(location) { return `Runs toward the ${location}` },
+	environments(types) { types.push('shores') }
 }
 ```
 
@@ -141,11 +147,18 @@ class Alligator {
 				merge: [
 					{ WaterTraits, use: [ 'swim', 'huntFish' ] },
 					{ LandTraits, use: [ 'run' ] }
-				]
+				],
+				append: [
+					{ WaterTraits, use: [ 'environment' ] },
+					{ LandTraits, use: [ 'environment' ] },
+				],
+				awaitPrepend: [ { WaterTraits, use: [ 'eatFish' ]} ]
 			}
 		}
 	}
 
+	environments(types = [ ]) { return types }
+	eatFish(number) { return `Eats ${number} fish`}
 }
 
 mix(Alligator).register()
@@ -155,6 +168,11 @@ alligator.swim('shore')
 // Swims toward the shore
 alligator.run('horizon')
 // Runs toward the horizon
+alligator.environments([ ])
+ // [ 'rivers', 'shores' ]
+await alligator.eatFish(3)
+// (Alligator model total number of fish eaten is increased by 3)
+// Eats 3 fish
 alligator.breathThroughGills()
 // TypeError: alligator.breathThroughGills is not a function
 ```
@@ -169,10 +187,10 @@ adds _new_ functions to the target. Errors if any of the functions _already_ exi
 _overrides_ functions that already exist on the target. Automatically passes in the original function as the first argument. Errors if any of the functions _do not yet_ exist on the target.
 
 ##### prepend
- _adds_ 'before hooks' to functions that already exist on the target. Errors if any of the functions do not yet exist on the target. Before hooks run synchronously.
+ _adds_ 'before hooks' to functions that already exist on the target. All arguments passed into the function are passed into the before hooks. Errors if any of the functions do not yet exist on the target. Before hooks run synchronously.
 
 ##### append
-_adds_ 'after hooks' to functions that already exist on the target. Errors if any of the attribute do not yet exist on the target. After hooks run synchronously.
+_adds_ 'after hooks' to functions that already exist on the target. All arguments passed into the function are passed into the after hooks. Errors if any of the functions do not yet exist on the target. After hooks run synchronously.
 
 For prepend and append, if the hooks should run _asynchronously_, use the special merges `awaitPrepend` and `awaitAppend`. Note, the methods these hooks are applied to will now each return a promise.
 
@@ -188,14 +206,14 @@ Example:
 // AnimalTypeMixins.js
 
 export const WaterTraits = {
-	// since swim's first argument is 'overridenMethod', it can be used with mergeOver()
+	// this function, intending to be mixed with mergeOver(), passes in the overridden method as its first argument
 	swim(overridenMethod, location) { return `Swims toward the ${location}` },
 
 	environments(types) { types.push('rivers') }
 }
 
 export const LandTraits = {
-	// since run's first argument is 'overridenMethod', it can be used with mergeOver()
+	// this function, intending to be mixed with mergeOver(), passes in the overridden method as its first argument
 	run(overridenMethod, location) { return `Runs toward the ${location}` },
 
 	walks() { 'walks' }
@@ -250,7 +268,6 @@ mix(classObject).register(SchemaName)
 
 #### Example Basic JSON Schema
 
-Note that, for the sake of example, this schema is made much longer than will usually be the case.
 ```js
 import { Animal } from 'Somewhere'
 import { LandTraits, WaterTraits} from 'Somewhere'
