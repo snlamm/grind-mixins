@@ -1,6 +1,7 @@
 # plugin-grind-mixins
 
 <a href="https://travis-ci.org/snlamm/grind-mixins"><img src="https://travis-ci.org/snlamm/grind-mixins.svg?branch=master" alt="Build Status"></a>
+<a href='https://coveralls.io/github/snlamm/grind-mixins?branch=master'><img src='https://coveralls.io/repos/github/snlamm/grind-mixins/badge.svg?branch=master' alt='Coverage Status' /></a>
 <a href="https://www.npmjs.com/package/plugin-grind-mixins"><img src="https://img.shields.io/gemnasium/mathiasbynens/he.svg" alt="Dependencies"></a>
 <a href="https://www.npmjs.com/package/plugin-grind-mixins"><img src="https://img.shields.io/npm/v/plugin-grind-mixins.svg" alt="NPM Version"></a>
 <a href="https://www.npmjs.com/package/plugin-grind-mixins"><img src="https://img.shields.io/npm/l/plugin-grind-mixins.svg" alt="License"></a>
