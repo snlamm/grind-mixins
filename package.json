@@ -1,6 +1,6 @@
 {
   "name": "plugin-grind-mixins",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": " Mixins provider for Grind Framework",
   "author": "Shmuel Lamm (@snlamm)",
   "license": "MIT",
@@ -34,9 +34,9 @@
   "scripts": {
     "prepublish": "bin/build",
     "lint": "eslint src",
-		"test": "ava --verbose",
-		"test-nyc": "nyc ava --verbose",
-		"coverage": "nyc report --reporter=text-lcov | coveralls"
+    "test": "ava --verbose",
+    "test-nyc": "nyc ava --verbose",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "ava": {
     "require": [
