@@ -118,7 +118,7 @@ test('register prebuild schema error', t => {
 	t.is(error.message, 'Mixin transition: Missing dependents for \'transitionToLand\': [ transitionToLand ]. Note: if using prototype, dependents must represent functions')
 })
 
-test('order of provider registering', async t => {
+test.serial('order of provider registering', async t => {
 	const app = new Grind({ configClass: class {
 		get(getting, defaults) { return defaults }
 	} })
@@ -142,4 +142,24 @@ test('order of provider registering', async t => {
 
 	t.is(heron.findAnimalType(), 'bird')
 	t.is(heron.sound(), 'Screetch')
+})
+
+test.serial('running providers multiple times, as in bin/watch', async t => {
+	const app = new Grind({ configClass: class {
+		get(getting, defaults) { return defaults }
+	} })
+
+	const MixinBuilderProvider = app => {
+		app.mixins.buildChain('Bird', ChainSimpleBird)
+		app.mixins.buildChain('Predator', ChainComplexPredator)
+	}
+
+	// don't test with app.providers.add, as the providers are cached and de-duped
+	MixinProvider(app)
+	MixinBuilderProvider(app)
+
+	MixinProvider(app)
+	MixinBuilderProvider(app)
+
+	t.pass()
 })
