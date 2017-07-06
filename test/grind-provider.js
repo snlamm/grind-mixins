@@ -117,3 +117,29 @@ test('register prebuild schema error', t => {
 	// eslint-disable-next-line max-len
 	t.is(error.message, 'Mixin transition: Missing dependents for \'transitionToLand\': [ transitionToLand ]. Note: if using prototype, dependents must represent functions')
 })
+
+test('order of provider registering', async t => {
+	const app = new Grind({ configClass: class {
+		get(getting, defaults) { return defaults }
+	} })
+
+	const MixinBuilderProvider = app => {
+		app.mixins.buildChain('Bird', ChainSimpleBird)
+		app.mixins.buildChain('Predator', ChainComplexPredator)
+	}
+
+	MixinBuilderProvider.priority = 5
+
+	app.providers.add(MixinProvider)
+	app.providers.add(MixinBuilderProvider)
+
+	await app.boot()
+
+	const Heron = class Heron extends app.mixins.mix(ExtendedClassAnimal)
+	.through('Bird', 'Predator') { }
+
+	const heron = new Heron()
+
+	t.is(heron.findAnimalType(), 'bird')
+	t.is(heron.sound(), 'Screetch')
+})
