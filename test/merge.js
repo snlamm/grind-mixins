@@ -231,3 +231,32 @@ test('register class MergeSchema outside of provider', t => {
 	t.is(alligator.runs(null, 'bushes'), 'Runs toward the bushes')
 	t.is(alligator.transitionToLand(), 'Can`t swim, then walks. Then: Runs toward the horizon')
 })
+
+test('depending upon an alias', t => {
+	class Alligator { }
+	const alligator = new Alligator
+
+	mix(alligator)
+	.merge([
+		{ LandAnimalTraits, use: [ 'walk as run' ] },
+		{ LandAnimalTraits, use: [ 'hunt' ], overrideDepends: 'hunt:[run]' }
+	])
+
+	t.is(alligator.hunt(), 'Looks in the bushes')
+
+	class AlligatorSchema {
+		static mergeMixins = {
+			onPrototype: {
+				merge: [
+					{ LandAnimalTraits, use: [ 'walk as run' ] },
+					{ LandAnimalTraits, use: [ 'hunt' ], overrideDepends: 'hunt:[run]' }
+				]
+			}
+		}
+	}
+
+	mix(AlligatorSchema).register()
+	const alligatorSchema = new AlligatorSchema()
+
+	t.is(alligatorSchema.hunt(), 'Looks in the bushes')
+})
