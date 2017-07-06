@@ -1,6 +1,6 @@
 {
   "name": "plugin-grind-mixins",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": " Mixins provider for Grind Framework",
   "author": "Shmuel Lamm (@snlamm)",
   "license": "MIT",
@@ -23,13 +23,13 @@
     "nyc": "^11.0.3"
   },
   "keywords": [
-		"es6",
-		"class",
-		"inheritance",
-		"grind",
+    "es6",
+    "class",
+    "inheritance",
+    "grind",
     "grindjs",
     "grind-framework",
-		"mixin",
+    "mixin",
     "mixins",
     "traits"
   ],
