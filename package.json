@@ -23,8 +23,13 @@
     "nyc": "^11.0.3"
   },
   "keywords": [
+		"es6",
+		"class",
+		"inheritance",
+		"grind",
     "grindjs",
     "grind-framework",
+		"mixin",
     "mixins",
     "traits"
   ],
