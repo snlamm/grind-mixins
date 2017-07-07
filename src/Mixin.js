@@ -219,31 +219,33 @@ export class Mixin {
 
 				this._validateMethodUsage(mixin, targetPropertyName, hasProperty, isHook, isOverride, missingDependents)
 
-				Object.defineProperty(target, targetPropertyName, {
+				Reflect.defineProperty(target, targetPropertyName, {
 					value: function(...args) {
 						if(!isHook && !isOverride) {
-							return mixinPropertyCall.apply(this, args)
+							return Reflect.apply(mixinPropertyCall, this, args)
 						} else if(!isHook && isOverride) {
-							return mixinPropertyCall.call(this, targetPropertyCall.bind(this), ...args)
+							args.unshift(targetPropertyCall.bind(this))
+
+							return Reflect.apply(mixinPropertyCall, this, args)
 						} else if(options.before) {
 							if(options.promisify) {
-								return Mixin._promisifyPrepend.call(
-									this, mixinPropertyCall, targetPropertyCall, ...args
-								)
+								args = [ mixinPropertyCall, targetPropertyCall, ...args ]
+
+								return Reflect.apply(Mixin._promisifyPrepend, this, args)
 							}
 
-							mixinPropertyCall.apply(this, args)
+							Reflect.apply(mixinPropertyCall, this, args)
 
-							return targetPropertyCall.apply(this, args)
+							return Reflect.apply(targetPropertyCall, this, args)
 						} else if(options.after) {
 							if(options.promisify) {
-								return Mixin._promisifyAppend.call(
-									this, mixinPropertyCall, targetPropertyCall, ...args
-								)
+								args = [ mixinPropertyCall, targetPropertyCall, ...args ]
+
+								return Reflect.apply(Mixin._promisifyAppend, this, args)
 							}
 
-							const value = targetPropertyCall.apply(this, args)
-							mixinPropertyCall.apply(this, args)
+							const value = Reflect.apply(targetPropertyCall, this, args)
+							Reflect.apply(mixinPropertyCall, this, args)
 
 							return value
 						}
@@ -255,14 +257,14 @@ export class Mixin {
 	}
 
 	static async _promisifyPrepend(mixinPropertyCall, targetPropertyCall, ...args) {
-		await mixinPropertyCall.apply(this, args)
+		await Reflect.apply(mixinPropertyCall, this, args)
 
-		return targetPropertyCall.apply(this, args)
+		return Reflect.apply(targetPropertyCall, this, args)
 	}
 
 	static async _promisifyAppend(mixinPropertyCall, targetPropertyCall, ...args) {
-		const value =  await targetPropertyCall.apply(this, args)
-		await mixinPropertyCall.apply(this, args)
+		const value = await Reflect.apply(targetPropertyCall, this, args)
+		await Reflect.apply(mixinPropertyCall, this, args)
 
 		return value
 	}
