@@ -296,7 +296,7 @@ export class Mixin {
 	usesPrototype = null
 
 	constructor(parentClass, usesPrototype = false) {
-		this.parentClass = parentClass
+		this.parentClass = parentClass || (class { })
 		this.usesPrototype = usesPrototype
 	}
 

@@ -69,3 +69,11 @@ test('chain complex inheritance mixins', t => {
 	t.is(heron.findAnimalType(), 'bird')
 	t.is(heron.hunt('fish'), 'The heron hunts fish using beak and talons')
 })
+
+test('Chain without passing in a base class', t => {
+	const Pidgeon = class Pidgeon extends mix().through(ChainSimpleBird) { }
+
+	const pidgeon = new Pidgeon()
+
+	t.is(pidgeon.hunt(), 'Does not hunt')
+})
