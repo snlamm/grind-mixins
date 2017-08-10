@@ -1,6 +1,6 @@
 {
   "name": "plugin-grind-mixins",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Build ES6 class mixins",
   "author": "Shmuel Lamm (@snlamm)",
   "license": "MIT",
