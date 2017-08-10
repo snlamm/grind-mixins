@@ -36,6 +36,9 @@ Plugin Grind Mixins, internally, is built using mixin patterns suggested by [Rag
 	- [Advanced Cached Mixin Object](#advanced-cached-mixin-object)
 	- [Pre-Registering JSON Schemas](#pre-registering-json-schemas)
 - [Contributing](#contributing)
+- [Release Notes](#release-notes)
+	- [0.1.4](#014)
+	- [0.1.3](#013)
 
 <!-- /TOC -->
 
@@ -64,7 +67,7 @@ parentClass => class OptionalClassName extends parentClass {
 Apply Inhertance mixins at class declaration with:
 
 ```js
-mix(BaseClass).through(Mixin1, Mixin2, ...)
+mix(OptionalBaseClass).through(Mixin1, Mixin2, ...)
 ```
 
 
@@ -712,6 +715,21 @@ alligator.run('horizon')
 ## Contributing
 Contributions are always welcome! You are encouraged to open issues and merge requests.
 
-Much of the dev environment is borrowed from Grind Framework, while the README borrows some language from the Grind Docs.
+Some of the dev environment is borrowed from Grind Framework, while the README borrows some language from the Grind Docs.
 
 To run the tests, use `npm run test`.
+
+## Release Notes
+
+### 0.1.4
+Inheritance
+- Inheritance chains no longer require a base class.
+
+Dev Environment
+- Update travis for node 8.
+- Update devDependencies.
+
+### 0.1.3
+MixinProvider
+- Add a default priority to avoid errors when used in Grind 0.6.
+- Re-cache mixins each time the provider is rerun to properly track changes to mixin code in development.
